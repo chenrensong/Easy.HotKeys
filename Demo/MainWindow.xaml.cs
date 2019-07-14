@@ -1,7 +1,11 @@
 ﻿using Easy.HotKeys;
+using Easy.WinAPI.Input;
 using System;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Interop;
+
 namespace Demo
 {
     /// <summary>
@@ -9,7 +13,7 @@ namespace Demo
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly EasyHotKey _easyHotKey = new EasyHotKey();
+        private readonly EasyHotKey _easyHotKey = new EasyHotKey(new RealHwndHook());
 
         public MainWindow()
         {
@@ -30,22 +34,22 @@ namespace Demo
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            _easyHotKey.Register(Key.F3, ModifierKeys.Control | ModifierKeys.Alt);
+            _easyHotKey.Register(EasyKey.F3, EasyModifierKeys.Control | EasyModifierKeys.Alt);
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            _easyHotKey.Unregister(Key.F3, ModifierKeys.Control | ModifierKeys.Alt);
+            _easyHotKey.Unregister(EasyKey.F3, EasyModifierKeys.Control | EasyModifierKeys.Alt);
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            _easyHotKey.Register(Key.A, ModifierKeys.Control);
+            _easyHotKey.Register(EasyKey.A, EasyModifierKeys.Control);
         }
 
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
-            _easyHotKey.Unregister(Key.A, ModifierKeys.Control);
+            _easyHotKey.Unregister(EasyKey.A, EasyModifierKeys.Control);
         }
 
         private void Button_Click_4(object sender, RoutedEventArgs e)

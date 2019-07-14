@@ -1,11 +1,10 @@
 ﻿using Easy.WinAPI;
+using Easy.WinAPI.Input;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Windows.Input;
-using System.Windows.Interop;
 
 namespace Easy.HotKeys
 {
@@ -14,16 +13,19 @@ namespace Easy.HotKeys
 
         private readonly Dictionary<HotKey, int> _registered = new Dictionary<HotKey, int>();
 
-        private readonly HwndSource _handleSource = new HwndSource(new HwndSourceParameters());
+        //private readonly HwndSource _handleSource = new HwndSource(new HwndSourceParameters());
 
         private bool _disposed = false;
+
+        private readonly IHwndHook _hwndHook = null;
 
         public event EventHandler<KeyPressedEventArgs> KeyPressed;
 
 
-        public EasyHotKey()
+        public EasyHotKey(IHwndHook hwndHook)
         {
-            _handleSource.AddHook(OnMessagesHandler);
+            _hwndHook = hwndHook;
+            _hwndHook.AddHook(OnMessagesHandler);
         }
 
         ~EasyHotKey()
@@ -31,7 +33,7 @@ namespace Easy.HotKeys
             this.Dispose(false);
         }
 
-        public HotKey Register(Key key, ModifierKeys modifiers)
+        public HotKey Register(EasyKey key, EasyModifierKeys modifiers)
         {
             var hotKey = new HotKey(key, modifiers);
             Register(hotKey);
@@ -45,15 +47,31 @@ namespace Easy.HotKeys
                 throw new ArgumentException("The specified hot key is already registered.");
             }
             var id = GetNewKeyId();
-            var key = KeyInterop.VirtualKeyFromKey(hotKey.Key);
-            if (!EasyWinAPI.RegisterHotKey(_handleSource.Handle, id, (uint)hotKey.ModifierKeys, (uint)key))
+            if (!EasyWinAPI.RegisterHotKey(_hwndHook.Handle, id, hotKey.ModifierKeys, hotKey.Key))
             {
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Can't register the hot key.");
             }
             _registered.Add(hotKey, id);
         }
 
-        public void Unregister(Key key, ModifierKeys modifiers)
+        public void Register(uint key, uint modifierKeys)
+        {
+            var key1 = EasyKeyInterop.KeyFromVirtualKey((int)key);
+            var modifierKeys1 = (EasyModifierKeys)modifierKeys;
+            var hotKey = new HotKey(key1, modifierKeys1);
+            if (_registered.ContainsKey(hotKey))
+            {
+                throw new ArgumentException("The specified hot key is already registered.");
+            }
+            var id = GetNewKeyId();
+            if (!EasyWinAPI.RegisterHotKey(_hwndHook.Handle, id, modifierKeys, key))
+            {
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "Can't register the hot key.");
+            }
+            _registered.Add(hotKey, id);
+        }
+
+        public void Unregister(EasyKey key, EasyModifierKeys modifiers)
         {
             var hotKey = new HotKey(key, modifiers);
             Unregister(hotKey);
@@ -64,7 +82,7 @@ namespace Easy.HotKeys
             int id;
             if (_registered.TryGetValue(hotKey, out id))
             {
-                EasyWinAPI.UnRegisterHotKey(_handleSource.Handle, id);
+                EasyWinAPI.UnRegisterHotKey(_hwndHook.Handle, id);
                 _registered.Remove(hotKey);
             }
         }
@@ -73,7 +91,7 @@ namespace Easy.HotKeys
         {
             foreach (var hotKey in _registered)
             {
-                EasyWinAPI.UnRegisterHotKey(_handleSource.Handle, hotKey.Value);
+                EasyWinAPI.UnRegisterHotKey(_hwndHook.Handle, hotKey.Value);
             }
             _registered.Clear();
         }
@@ -91,8 +109,8 @@ namespace Easy.HotKeys
                 return;
             }
             UnregisterAll();
-            _handleSource.RemoveHook(OnMessagesHandler);
-            _handleSource.Dispose();
+            _hwndHook.RemoveHook(OnMessagesHandler);
+            _hwndHook.Dispose();
             if (disposing)
             {
             }
@@ -109,8 +127,8 @@ namespace Easy.HotKeys
         {
             if (message == 0x0312)
             {
-                var key = KeyInterop.KeyFromVirtualKey(((int)lParam >> 16) & 0xFFFF);
-                var modifierKeys = (ModifierKeys)((int)lParam & 0xFFFF);
+                var key = EasyKeyInterop.KeyFromVirtualKey(((int)lParam >> 16) & 0xFFFF);
+                var modifierKeys = (EasyModifierKeys)((int)lParam & 0xFFFF);
                 OnKeyPressed(key, modifierKeys);
                 handled = true;
                 return new IntPtr(1);
@@ -118,7 +136,7 @@ namespace Easy.HotKeys
             return IntPtr.Zero;
         }
 
-        private void OnKeyPressed(Key key, ModifierKeys modifierKeys)
+        private void OnKeyPressed(EasyKey key, EasyModifierKeys modifierKeys)
         {
             if (KeyPressed != null)
             {

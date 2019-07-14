@@ -1,9 +1,17 @@
-# Easy.HotKeys
-Windows Global HotKeys
-ÓÉÓÚ.net standard 2.0 ÔİÊ±²»Ö§³Ö HwndSource£¬Ê¹ÓÃEasy.HotKeysÊ±ºò£¬ĞèÒªÍ¨¹ıIHwndHook³éÏóÀ´ÊµÏÖHwndSource×¢Èë£¬ÉÔÎ¢Âé·³Ò»Ğ©£¬¾ßÌå´úÂëÈçÏÂ£º
+ï»¿using Easy.HotKeys;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Interop;
 
-```csharp
-	public class RealHwndHook : IHwndHook
+namespace Demo
+{
+    /// <summary>
+    /// å½“å‰.net standard 2.0 æš‚æ—¶ä¸æ”¯æŒ HwndSourceï¼Œé€šè¿‡IHwndHookæŠ½è±¡æ¥å®ç°HwndSourceæ³¨å…¥ï¼Œç¨å¾®éº»çƒ¦ä¸€äº›
+    /// </summary>
+    public class RealHwndHook : IHwndHook
     {
         private readonly HwndSource _handleSource = new HwndSource(new HwndSourceParameters());
         private List<HwndHook> _weakReferences = new List<HwndHook>();
@@ -61,10 +69,4 @@ Windows Global HotKeys
             return IntPtr.Zero;
         }
     }
-```
-
-ĞèÒªÔÚÊ¹ÓÃµÄÊ±ºòĞÂ½¨`RealHwndHook`Àà,³õÊ¼»¯EasyHotKeyµÄÊ±ºò´«Èë
-
-```csharp
-     private readonly EasyHotKey _easyHotKey = new EasyHotKey(new RealHwndHook());
-```
+}

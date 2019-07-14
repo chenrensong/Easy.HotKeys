@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Easy.WinAPI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Easy.WinAPI.1.0.0\lib\netstandard2.0\Easy.WinAPI.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -63,6 +66,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="RealHwndHook.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -86,6 +90,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -96,7 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Easy.HotKeys\Easy.HotKeys.csproj">
-      <Project>{b3c24fb7-5404-4392-af37-90be41f44eef}</Project>
+      <Project>{b0a9eaa0-4c6a-463d-98d6-5a0a9fe561d9}</Project>
       <Name>Easy.HotKeys</Name>
     </ProjectReference>
   </ItemGroup>

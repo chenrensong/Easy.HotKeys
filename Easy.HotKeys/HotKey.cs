@@ -1,3 +1,4 @@
+using Easy.WinAPI.Input;
 using System.Text;
 using System.Windows.Input;
 
@@ -5,7 +6,7 @@ namespace Easy.HotKeys
 {
     public class HotKey
     {
-        public HotKey(Key key, ModifierKeys modifierKeys)
+        public HotKey(EasyKey key, EasyModifierKeys modifierKeys)
         {
             Key = key;
             ModifierKeys = modifierKeys;
@@ -15,9 +16,9 @@ namespace Easy.HotKeys
         {
         }
 
-        public Key Key { get; set; }
+        public EasyKey Key { get; set; }
 
-        public ModifierKeys ModifierKeys { get; set; }
+        public EasyModifierKeys ModifierKeys { get; set; }
 
         public override bool Equals(object obj)
         {
@@ -49,7 +50,7 @@ namespace Easy.HotKeys
         {
             var builder = new StringBuilder();
             var keys = ModifierKeys.ToString().Split(',');
-            foreach (var key in keys)
+            foreach (var key in keys) 
             {
                 builder.Append(key);
                 builder.Append("+");
