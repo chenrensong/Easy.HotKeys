@@ -4,7 +4,8 @@ Windows Global HotKeys
 由于.net standard 2.0 暂时不支持 HwndSource，使用Easy.HotKeys时候，需要通过IHwndHook抽象来实现HwndSource注入，稍微麻烦一些，具体代码如下：
 
 ```csharp
-public class RealHwndHook : IHwndHook
+  
+    public class RealHwndHook : IHwndHook
     {
         private readonly HwndSource _handleSource = new HwndSource(new HwndSourceParameters());
         private List<HwndHook> _weakReferences = new List<HwndHook>();
