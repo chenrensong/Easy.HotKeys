@@ -71,4 +71,4 @@ Windows Global HotKeys
      private readonly EasyHotKey _easyHotKey = new EasyHotKey(new RealHwndHook());
 ```
 
-具体的使用方式，可以查看Demo
+具体的使用方式，可以查看Demo。
