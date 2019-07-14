@@ -1,9 +1,10 @@
 # Easy.HotKeys
 Windows Global HotKeys
-ÓÉÓÚ.net standard 2.0 ÔİÊ±²»Ö§³Ö HwndSource£¬Ê¹ÓÃEasy.HotKeysÊ±ºò£¬ĞèÒªÍ¨¹ıIHwndHook³éÏóÀ´ÊµÏÖHwndSource×¢Èë£¬ÉÔÎ¢Âé·³Ò»Ğ©£¬¾ßÌå´úÂëÈçÏÂ£º
+
+ç”±äº.net standard 2.0 æš‚æ—¶ä¸æ”¯æŒ HwndSourceï¼Œä½¿ç”¨Easy.HotKeysæ—¶å€™ï¼Œéœ€è¦é€šè¿‡IHwndHookæŠ½è±¡æ¥å®ç°HwndSourceæ³¨å…¥ï¼Œç¨å¾®éº»çƒ¦ä¸€äº›ï¼Œå…·ä½“ä»£ç å¦‚ä¸‹ï¼š
 
 ```csharp
-	public class RealHwndHook : IHwndHook
+public class RealHwndHook : IHwndHook
     {
         private readonly HwndSource _handleSource = new HwndSource(new HwndSourceParameters());
         private List<HwndHook> _weakReferences = new List<HwndHook>();
@@ -63,7 +64,7 @@ Windows Global HotKeys
     }
 ```
 
-ĞèÒªÔÚÊ¹ÓÃµÄÊ±ºòĞÂ½¨`RealHwndHook`Àà,³õÊ¼»¯EasyHotKeyµÄÊ±ºò´«Èë
+éœ€è¦åœ¨ä½¿ç”¨çš„æ—¶å€™æ–°å»º`RealHwndHook`ç±»,åˆå§‹åŒ–EasyHotKeyçš„æ—¶å€™ä¼ å…¥
 
 ```csharp
      private readonly EasyHotKey _easyHotKey = new EasyHotKey(new RealHwndHook());
