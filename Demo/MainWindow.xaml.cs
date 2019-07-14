@@ -1,18 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Easy.HotKeys;
+using System;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Easy.HotKeys;
 namespace Demo
 {
     /// <summary>
@@ -47,6 +36,21 @@ namespace Demo
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             _easyHotKey.Unregister(Key.F3, ModifierKeys.Control | ModifierKeys.Alt);
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            _easyHotKey.Register(Key.A, ModifierKeys.Control);
+        }
+
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            _easyHotKey.Unregister(Key.A, ModifierKeys.Control);
+        }
+
+        private void Button_Click_4(object sender, RoutedEventArgs e)
+        {
+            _easyHotKey.UnregisterAll();
         }
     }
 }

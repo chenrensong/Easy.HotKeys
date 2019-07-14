@@ -69,12 +69,20 @@ namespace Easy.HotKeys
             }
         }
 
+        public void UnregisterAll()
+        {
+            foreach (var hotKey in _registered)
+            {
+                EasyWinAPI.UnRegisterHotKey(_handleSource.Handle, hotKey.Value);
+            }
+            _registered.Clear();
+        }
+
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-
 
         protected virtual void Dispose(bool disposing)
         {
@@ -82,15 +90,11 @@ namespace Easy.HotKeys
             {
                 return;
             }
-            foreach (var hotKey in _registered)
-            {
-                EasyWinAPI.UnRegisterHotKey(_handleSource.Handle, hotKey.Value);
-            }
+            UnregisterAll();
             _handleSource.RemoveHook(OnMessagesHandler);
             _handleSource.Dispose();
             if (disposing)
             {
-                _registered.Clear();
             }
             _disposed = true;
         }

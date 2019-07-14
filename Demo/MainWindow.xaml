@@ -8,6 +8,9 @@
         Title="MainWindow" Height="450" Width="800">
     <StackPanel Orientation="Vertical">
         <Button Margin="30" Content="Register Ctrl+Alt+F3" Click="Button_Click"/>
-        <Button Margin="30" Content="UnRegister" Click="Button_Click_1"/>
+        <Button Margin="30" Content="Register Ctrl+A" Click="Button_Click_2"/>
+        <Button Margin="30" Content="UnRegister Ctrl+Alt+F3" Click="Button_Click_1"/>
+        <Button Margin="30" Content="UnRegister Ctrl+A" Click="Button_Click_3"/>
+        <Button Margin="30" Content="UnRegister All" Click="Button_Click_4"/>
     </StackPanel>
 </Window>
