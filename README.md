@@ -1,7 +1,7 @@
 # Easy.HotKeys
 Windows Global HotKeys
 
-由于.net standard 2.0 暂时不支持 HwndSource，使用Easy.HotKeys时候，需要通过IHwndHook抽象来实现HwndSource注入，稍微麻烦一些，具体代码如下：
+由于.net standard 2.0 暂时不支持`HwndSource`，使用Easy.HotKeys时候，需要通过`IHwndHook`接口来实现`HwndSource`注入，稍微麻烦一些，具体代码如下：
 
 ```csharp
   
@@ -65,7 +65,7 @@ Windows Global HotKeys
     }
 ```
 
-需要在使用的时候新建`RealHwndHook`类,初始化EasyHotKey的时候传入
+需要在使用的时候新建`RealHwndHook`类,初始化`EasyHotKey`的时候传入
 
 ```csharp
      private readonly EasyHotKey _easyHotKey = new EasyHotKey(new RealHwndHook());
