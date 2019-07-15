@@ -1,70 +1,11 @@
 # Easy.HotKeys
 Windows Global HotKeys
-由于.net standard 2.0 暂时不支持 HwndSource，使用Easy.HotKeys时候，需要通过IHwndHook抽象来实现HwndSource注入，稍微麻烦一些，具体代码如下：
 
-```csharp
-	public class RealHwndHook : IHwndHook
-    {
-        private readonly HwndSource _handleSource = new HwndSource(new HwndSourceParameters());
-        private List<HwndHook> _weakReferences = new List<HwndHook>();
-        public IntPtr Handle
-        {
-            get
-            {
-                return _handleSource.Handle;
-            }
-        }
+## 版本日历
 
-        public void AddHook(Easy.HotKeys.HwndHook hook)
-        {
-            _weakReferences.Add(hook);
-            _handleSource.AddHook(OnMessagesHandler);
-        }
+### 1.2版本升级实现，采用Hook键盘的方式，代码精简，不需要外部注入，只依赖`Easy.WinAPI`不需要其他任何依赖项，当然由于采用了WinAPI,该项目只能用于Windows平台。
 
-        public void Dispose()
-        {
-            _handleSource.Dispose();
-            _weakReferences.Clear();
-        }
+### 1.1版本改造为.Net Standard 2.0  暂时不支持 HwndSource，使用Easy.HotKeys时候，需要通过IHwndHook抽象来实现HwndSource注入。
 
-        public void RemoveHook(Easy.HotKeys.HwndHook hook)
-        {
-            if (hook == null)
-            {
-                return;
-            }
-            HwndHook target = null;
-            foreach (var item in _weakReferences)
-            {
-                if (item.Equals(hook))
-                {
-                    target = item;
-                    return;
-                }
-            }
-            if (target != null)
-            {
-                _weakReferences.Remove(target);
-            }
-        }
+### 1.0版本采用.Net Framework实现，主要依赖HwndSource来Hook API
 
-        private IntPtr OnMessagesHandler(IntPtr handle, int message, IntPtr wParam, IntPtr lParam, ref bool handled)
-        {
-            foreach (var hwnd in _weakReferences)
-            {
-                var result = hwnd(handle, message, wParam, lParam, ref handled);
-                if (handled)
-                {
-                    return result;
-                }
-            }
-            return IntPtr.Zero;
-        }
-    }
-```
-
-需要在使用的时候新建`RealHwndHook`类,初始化EasyHotKey的时候传入
-
-```csharp
-     private readonly EasyHotKey _easyHotKey = new EasyHotKey(new RealHwndHook());
-```

@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo", "Demo\Demo.csproj", "{4D3BE55B-6798-4AE8-8132-6061E404A044}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Easy.HotKeys", "Easy.HotKeys\Easy.HotKeys.csproj", "{B0A9EAA0-4C6A-463D-98D6-5A0A9FE561D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Easy.HotKeys", "Easy.HotKeys\Easy.HotKeys.csproj", "{B0A9EAA0-4C6A-463D-98D6-5A0A9FE561D9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

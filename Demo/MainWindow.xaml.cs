@@ -13,7 +13,7 @@ namespace Demo
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly EasyHotKey _easyHotKey = new EasyHotKey(new RealHwndHook());
+        private readonly EasyHotKey _easyHotKey = new EasyHotKey();
 
         public MainWindow()
         {

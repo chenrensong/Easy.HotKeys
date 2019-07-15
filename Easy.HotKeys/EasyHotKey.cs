@@ -3,6 +3,7 @@ using Easy.WinAPI.Input;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -11,21 +12,37 @@ namespace Easy.HotKeys
     public class EasyHotKey : IDisposable
     {
 
-        private readonly Dictionary<HotKey, int> _registered = new Dictionary<HotKey, int>();
+        private readonly static Dictionary<EasyKey, EasyModifierKeys> _keyMap = new Dictionary<EasyKey, EasyModifierKeys>()
+        {
+                { EasyKey.LeftAlt,EasyModifierKeys.Alt},
+                { EasyKey.RightAlt,EasyModifierKeys.Alt},
+                { EasyKey.LWin,EasyModifierKeys.Windows},
+                { EasyKey.RWin,EasyModifierKeys.Windows},
+                { EasyKey.LeftCtrl,EasyModifierKeys.Control},
+                { EasyKey.RightCtrl,EasyModifierKeys.Control},
+                { EasyKey.LeftShift,EasyModifierKeys.Shift},
+                { EasyKey.RightShift,EasyModifierKeys.Shift}
+        };
 
-        //private readonly HwndSource _handleSource = new HwndSource(new HwndSourceParameters());
+        private List<EasyKey> _pressKeys = new List<EasyKey>();
+
+        private readonly Dictionary<HotKey, int> _registered = new Dictionary<HotKey, int>();
 
         private bool _disposed = false;
 
-        private readonly IHwndHook _hwndHook = null;
+        private IntPtr _hookId;
 
         public event EventHandler<KeyPressedEventArgs> KeyPressed;
 
+        /// <summary>
+        /// 避免被垃圾回收
+        /// </summary>
+        private static LowLevelKeyboardProc _hookproc;
 
-        public EasyHotKey(IHwndHook hwndHook)
+        public EasyHotKey()
         {
-            _hwndHook = hwndHook;
-            _hwndHook.AddHook(OnMessagesHandler);
+            _hookproc = new LowLevelKeyboardProc(HookCallBack);
+            _hookId = EasyWinAPI.SetKeyboardHookEx(_hookproc);
         }
 
         ~EasyHotKey()
@@ -47,10 +64,6 @@ namespace Easy.HotKeys
                 throw new ArgumentException("The specified hot key is already registered.");
             }
             var id = GetNewKeyId();
-            if (!EasyWinAPI.RegisterHotKey(_hwndHook.Handle, id, hotKey.ModifierKeys, hotKey.Key))
-            {
-                throw new Win32Exception(Marshal.GetLastWin32Error(), "Can't register the hot key.");
-            }
             _registered.Add(hotKey, id);
         }
 
@@ -59,16 +72,7 @@ namespace Easy.HotKeys
             var key1 = EasyKeyInterop.KeyFromVirtualKey((int)key);
             var modifierKeys1 = (EasyModifierKeys)modifierKeys;
             var hotKey = new HotKey(key1, modifierKeys1);
-            if (_registered.ContainsKey(hotKey))
-            {
-                throw new ArgumentException("The specified hot key is already registered.");
-            }
-            var id = GetNewKeyId();
-            if (!EasyWinAPI.RegisterHotKey(_hwndHook.Handle, id, modifierKeys, key))
-            {
-                throw new Win32Exception(Marshal.GetLastWin32Error(), "Can't register the hot key.");
-            }
-            _registered.Add(hotKey, id);
+            Register(hotKey);
         }
 
         public void Unregister(EasyKey key, EasyModifierKeys modifiers)
@@ -82,17 +86,12 @@ namespace Easy.HotKeys
             int id;
             if (_registered.TryGetValue(hotKey, out id))
             {
-                EasyWinAPI.UnRegisterHotKey(_hwndHook.Handle, id);
                 _registered.Remove(hotKey);
             }
         }
 
         public void UnregisterAll()
         {
-            foreach (var hotKey in _registered)
-            {
-                EasyWinAPI.UnRegisterHotKey(_hwndHook.Handle, hotKey.Value);
-            }
             _registered.Clear();
         }
 
@@ -108,42 +107,81 @@ namespace Easy.HotKeys
             {
                 return;
             }
-            UnregisterAll();
-            _hwndHook.RemoveHook(OnMessagesHandler);
-            _hwndHook.Dispose();
             if (disposing)
             {
             }
+            UnregisterAll();
+            EasyWinAPI.UnhookWindowsHookEx(this._hookId);
             _disposed = true;
         }
 
+        /// <summary>
+        /// 是否是Ctrl、Alt、Shift
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        private bool TryGetModifierKey(EasyKey key, out EasyModifierKeys modifierKeys)
+        {
+            modifierKeys = EasyModifierKeys.None;
+            bool hasFlag = false;
+            if (hasFlag = _keyMap.ContainsKey(key))
+            {
+                modifierKeys = _keyMap[key];
+            }
+            return hasFlag;
+        }
 
         private int GetNewKeyId()
         {
             return _registered.Any() ? _registered.Values.Max() + 1 : 0;
         }
 
-        private IntPtr OnMessagesHandler(IntPtr handle, int message, IntPtr wParam, IntPtr lParam, ref bool handled)
+        private IntPtr HookCallBack(int nCode, IntPtr wParam, IntPtr lParam)
         {
-            if (message == 0x0312)
+            int keyState = (int)wParam;
+            int vkCode = Marshal.ReadInt32(lParam);
+            var keyPressed = EasyKeyInterop.KeyFromVirtualKey(vkCode);
+            if (nCode >= 0 && (wParam == (IntPtr)NativeMethods.WM_KEYDOWN || wParam == (IntPtr)NativeMethods.WM_SYSKEYDOWN))
             {
-                var key = EasyKeyInterop.KeyFromVirtualKey(((int)lParam >> 16) & 0xFFFF);
-                var modifierKeys = (EasyModifierKeys)((int)lParam & 0xFFFF);
-                OnKeyPressed(key, modifierKeys);
-                handled = true;
-                return new IntPtr(1);
+                if (_pressKeys.IndexOf(keyPressed) < 0)
+                {
+                    _pressKeys.Add(keyPressed);
+                }
+                EasyModifierKeys modifierKeys = default(EasyModifierKeys);
+                EasyKey easyKey = default(EasyKey);
+                foreach (var key in _pressKeys)
+                {
+                    if (TryGetModifierKey(key, out EasyModifierKeys keys))
+                    {
+                        modifierKeys = modifierKeys | keys;
+                    }
+                    else
+                    {
+                        easyKey = easyKey | key;
+                    }
+                }
+                var hotKey = new HotKey(easyKey, modifierKeys);
+                if (_registered.ContainsKey(hotKey))
+                {
+                    OnKeyPressed(hotKey);
+                }
             }
-            return IntPtr.Zero;
+            if (nCode >= 0 && (wParam == (IntPtr)NativeMethods.WM_KEYUP || wParam == (IntPtr)NativeMethods.WM_SYSKEYUP))
+            {
+                _pressKeys.Remove(keyPressed);
+            }
+            return EasyWinAPI.CallNextHookEx(_hookId, nCode, wParam, lParam);
         }
 
-        private void OnKeyPressed(EasyKey key, EasyModifierKeys modifierKeys)
+
+        private void OnKeyPressed(HotKey hotKey)
         {
             if (KeyPressed != null)
             {
-                var hotKey = new HotKey(key, modifierKeys);
                 var args = new KeyPressedEventArgs(hotKey);
                 KeyPressed(this, args);
             }
         }
     }
 }
+
