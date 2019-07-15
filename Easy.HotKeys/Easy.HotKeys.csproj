@@ -1,7 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+
+    <VersionPrefix>1.2.0</VersionPrefix>
+    <Version>1.2.0</Version>
+    <Authors>chenrensong</Authors>
+    <PackageProjectUrl>https://github.com/chenrensong/Easy.HotKeys</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AssemblyName>Easy.HotKeys</AssemblyName>
+    <PackageId>Easy.HotKeys</PackageId>
+    <PackageTags>toolkit</PackageTags>
+    <RepositoryUrl>git://github.com/chenrensong/Easy.HotKeys</RepositoryUrl>
+    <Description>提供常用的WinAPI封装。</Description>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
